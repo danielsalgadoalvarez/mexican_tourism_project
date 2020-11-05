@@ -1,0 +1,87 @@
+---
+title: "tourism_data.Rmd"
+author: "Daniel Salgado-Alvarez"
+date: "11/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) 
+library(readxl) 
+library(janitor)
+```
+
+```{r}
+revenue <- read_xlsx("datos/3_3.xlsx", sheet = 2, skip = 2) %>%
+  slice(2:7) %>%
+  select(-c(...1, ...3, ...43, ...44, ...45))
+colnames(revenue)[1] <- "reason"
+
+revenue <- revenue %>%
+  mutate(reason = recode(reason, 
+                         `Por Motivo del Viaje` = "All", 
+                         `Placer` = "Pleasure", 
+                         `Negocios` = "Businesss", 
+                         `Visita a Familiares` = "Visiting Family", 
+                         `Visita a Amistades` = "Visiting Friends",
+                         `Otros` = "Other")) %>%
+  pivot_longer(cols = -reason, names_to = "year", values_to = "revenue") %>%
+  mutate(year = as.numeric(year))
+```
+
+```{r}
+visits <- read_xlsx("datos/3_1.xlsx", sheet = 1, skip = 1) %>%
+  slice(7:13) %>%
+  select(!c(...2, Unidades)) 
+  colnames(visits)[1] <- "tourist_type"
+
+visits <- visits %>%
+  mutate(tourist_type = recode(tourist_type, 
+                         `Visitantes Internacionales a México` = "International Visitors", 
+                         `Turistas Internacionales` = "International Tourists", 
+                         `Turismo Receptivo` = "Receptive Tourism", 
+                         `Excursionistas Internacionales` = "International Excusions/Day Trips", 
+                         `Excursionistas Fronterizos` = "Border Excursions/ Day Trip",
+                         `Pasajeros en Crucero` = "Cruise Ship Travelers")) %>%
+  pivot_longer(cols = -tourist_type, names_to = "year", values_to = "quantity") %>%
+  mutate(year = as.numeric(year))
+```
+
+```{r}
+GDP <- read_xlsx("datos/PIBE_37.xlsx", sheet = 1, skip = 3) %>%
+  mutate(`2003` = as.numeric(`2003`)) %>%
+  slice(5:36) %>%
+  pivot_longer(cols = -Concepto, names_to = "Year", values_to = "GDP_millions" ) %>%
+  mutate(Year = str_remove_all(Year, pattern = "R"))
+colnames(GDP)[1] <- "state"
+```
+
+```{r}
+crime <- read_xlsx("datos/victimization.xlxs.xlsx", sheet = 1, skip = 1) %>%
+  slice(2:33) %>%
+  pivot_longer(cols = -State, names_to = "Year", values_to = "victimization" )
+colnames(crime)[1] <- "state"
+
+perception <- read_xlsx("datos/perception.xlsx", sheet = 1, skip = 1) %>%
+  slice(2:33) %>%
+  pivot_longer(cols = -state, names_to = "Year", values_to = "score" )
+
+population <- read_xlsx("datos/population.xlsx") %>%
+  slice(2:33) 
+
+```
+
+```{r}
+full_1 <- left_join(GDP, population, by = "state") %>%
+  mutate(GDP_capita = (GDP_millions * 1000000)/population)
+full_2 <- left_join(full_1, crime, by = c("state", "Year"))
+full <- left_join(full_2, perception, by = c("state", "Year"))
+  
+
+
+ggplot(full, aes(x = victimization, y = GDP_capita)) +
+  geom_point() +
+  geom_smooth()
+```
+
