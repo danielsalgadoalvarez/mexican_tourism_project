@@ -10,7 +10,8 @@
 library(shiny)
 library(tidyverse)
 revenue <- readRDS("revenue.RDS")
-visits <- readRDS("visits.RDS")
+visits <- readRDS("Visits.RDS")
+full <- readRDS("test.RDS")
 
 # Define UI for application that draws a histogram
 ui <- navbarPage(
@@ -18,21 +19,22 @@ ui <- navbarPage(
     tabPanel("Size of Tourism",
              fluidPage(
                  titlePanel("How Big is the Tourism Sector?"),
-                 sidebarLayout(
-                     sidebarPanel(
-                         radioButtons(
-                             "buttons",
-                             "Interactive Features (Coming Soon)",
-                             c("Option A" = "a", "Option B" = "b"))
-                         ),
-                     mainPanel(plotOutput("revPlot"))
-                     )
-                 ),
-             mainPanel(plotOutput("visPlot"))
-             ),
+                 tabsetPanel(
+                     tabPanel("Revenue",
+                              checkboxGroupInput("rev", label = "Select Reason", 
+                                                 choices = unique(revenue$reason), 
+                                                 selected = "All"),
+                              plotOutput("revPlot")), 
+                     tabPanel("Visits", plotOutput("visPlot"))
+                    
+                 )
+             )), 
+             
+                
     tabPanel("Factors of Tourism",
              fluidPage(
                  titlePanel("What Factors Influence Tourism Revenue?"),
+                 selectInput("factor", label = "Select Factor", choices = c("victimization", "score")),
                  mainPanel(plotOutput("factPlot"))
              )
     ), 
@@ -63,7 +65,9 @@ ui <- navbarPage(
 server <- function(input, output) {
     
     output$revPlot <- renderPlot({
-        ggplot(revenue, aes(x = year, y = revenue, color = reason)) +
+        revenue %>%
+            filter(reason %in% input$rev) %>%
+        ggplot(aes(x = year, y = revenue, color = reason)) +
             geom_line(na.rm = TRUE) +
             labs(title = "Total Revenue from International Tourism by Reason 
                  for Trip",
@@ -79,12 +83,12 @@ server <- function(input, output) {
     })
         
         output$factPlot <- renderPlot({
-            ggplot(full, aes(x = victimization, y = GDP_capita)) +
+            ggplot(full, aes_string(x = input$factor, y = "GDP_capita")) +
                 geom_point(na.rm = TRUE) +
                 geom_smooth() +
                 labs(title = "Tourism GDP",
-                     x = "Tourism GDP Per Capita",
-                     y = "Victimization Per 100,000")      
+                     x = input$factor,
+                     y = "Tourism GDP Per Capita")      
         })
 }
 

@@ -1,0 +1,12 @@
+name: tourism_project
+title: tourism_project
+username:
+account: danielsalgadoalvarez
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3173239
+bundleId: 3852744
+url: https://danielsalgadoalvarez.shinyapps.io/tourism_project/
+when: 1605197503.77859
+asMultiple: FALSE
+asStatic: FALSE
