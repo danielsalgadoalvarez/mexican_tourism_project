@@ -12,7 +12,7 @@ library(readxl)
 library(janitor)
 ```
 
-```{r}
+```{r revenue}
 revenue <- read_xlsx("datos/3_3.xlsx", sheet = 2, skip = 2) %>%
   slice(2:7) %>%
   select(-c(...1, ...3, ...43, ...44, ...45))
@@ -30,7 +30,7 @@ revenue <- revenue %>%
   mutate(year = as.numeric(year))
 ```
 
-```{r}
+```{r visits}
 visits <- read_xlsx("datos/3_1.xlsx", sheet = 1, skip = 1) %>%
   slice(7:13) %>%
   select(!c(...2, Unidades)) 
@@ -48,7 +48,7 @@ visits <- visits %>%
   mutate(year = as.numeric(year))
 ```
 
-```{r}
+```{r gdp}
 GDP <- read_xlsx("datos/PIBE_37.xlsx", sheet = 1, skip = 3) %>%
   mutate(`2003` = as.numeric(`2003`)) %>%
   slice(5:36) %>%
@@ -57,7 +57,7 @@ GDP <- read_xlsx("datos/PIBE_37.xlsx", sheet = 1, skip = 3) %>%
 colnames(GDP)[1] <- "state"
 ```
 
-```{r}
+```{r crime}
 crime <- read_xlsx("datos/victimization.xlxs.xlsx", sheet = 1, skip = 1) %>%
   slice(2:33) %>%
   pivot_longer(cols = -State, names_to = "Year", values_to = "victimization" )
@@ -69,19 +69,142 @@ perception <- read_xlsx("datos/perception.xlsx", sheet = 1, skip = 1) %>%
 
 population <- read_xlsx("datos/population.xlsx") %>%
   slice(2:33) 
+```
+
+```{r hotels}
+hotels <- read_xlsx("datos/6_1.xlsx", sheet = 8) %>%
+  slice(7:166) 
+  states <- unique(hotels$Estado)[which(!is.na(unique(hotels$Estado)))]
+hotels <- hotels %>%
+  mutate(state = rep(states, each = 5)) %>%
+  select(-Estado) %>%
+   select(-`1992`) %>%
+  group_by(Categoria, state) %>%
+  pivot_longer(cols = -c(state, Categoria), 
+               names_to = "Year", values_to = "rooms") %>%
+  group_by(state, Year) 
+
+one_star <- hotels %>%
+  filter(Categoria == "1 Estrella") %>%
+  mutate(one_star = rooms) %>%
+  select(-c(Categoria, rooms)) 
+
+two_star <- hotels %>%
+  filter(Categoria == "2 Estrellas") %>%
+  mutate(two_star = rooms) %>%
+  select(-c(Categoria, rooms))
+
+three_star <- hotels %>%
+  filter(Categoria == "3 Estrellas") %>%
+  mutate(three_star = rooms) %>%
+  select(-c(Categoria, rooms)) 
+
+four_star <- hotels %>%
+  filter(Categoria == "4 Estrellas") %>%
+  mutate(four_star = rooms) %>%
+  select(-c(Categoria, rooms)) 
+
+five_star <- hotels %>%
+  filter(Categoria == "5 Estrellas") %>%
+  mutate(five_star = rooms) %>%
+  select(-c(Categoria, rooms)) 
+```
+
+```{r teaching}
+teaching <- read_xlsx("datos/11_1_redo.xlsx") %>%
+  pivot_longer(cols = -state, names_to = "Year", values_to = "schools" )
+
 
 ```
 
 ```{r}
+food <- read_xlsx("datos/10_2_res.xlsx", sheet = 4) %>%
+  slice(8:40) %>%
+  pivot_longer(cols = -Estado, names_to = "Year", values_to = "restaurants" ) %>%
+  mutate(restaurants = as.double(restaurants))  %>%
+  filter(restaurants <= 600)
+
+colnames(food)[1] <- "state"
+
+food_2 <- read_xlsx("datos/10_2_night.xlsx", sheet = 4) %>%
+  slice(8:40) %>%
+  pivot_longer(cols = -Estado, names_to = "Year", values_to = "nightlife" ) %>%
+  mutate(nightlife = as.double(nightlife)) %>%
+  filter(nightlife <= 200)
+
+colnames(food_2)[1] <- "state"
+
+
+```
+
+```{r agencies}
+agency <- read_xlsx("datos/10_3_agencies.xlsx", sheet = 4) %>%
+  slice(8:40) %>%
+  pivot_longer(cols = -Estado, names_to = "Year", values_to = "agencies" ) %>%
+  mutate(agencies = as.double(agencies)) 
+
+colnames(agency)[1] <- "state"
+```
+
+
+```{r}
 full_1 <- left_join(GDP, population, by = "state") %>%
   mutate(GDP_capita = (GDP_millions * 1000000)/population)
+
+# GDP_capita is tourism GDP per person
+
 full_2 <- left_join(full_1, crime, by = c("state", "Year"))
-full <- left_join(full_2, perception, by = c("state", "Year"))
+
+# Victimization is the rate of crime per 100,000
+
+full_3 <- left_join(full_2, perception, by = c("state", "Year"))
+
+# Score is the percent of people surveyed that felt unsafe in their state
+
+full_4 <- left_join(full_3, one_star, by = c("state", "Year")) %>%
+  mutate(one_star = (one_star/population)*100000)
+full_5 <- left_join(full_4, two_star, by = c("state", "Year")) %>%
+  mutate(two_star = (two_star/population)*100000)
+full_6 <- left_join(full_5, three_star, by = c("state", "Year")) %>%
+  mutate(three_star = (three_star/population)*100000)
+full_7 <- left_join(full_6, four_star, by = c("state", "Year")) %>%
+  mutate(four_star = (four_star/population)*100000)
+full_8 <- left_join(full_7, five_star, by = c("state", "Year")) %>%
+  mutate(five_star = (five_star/population)*100000) %>%
+  mutate(luxury_percent = (four_star + five_star)/(one_star + two_star + 
+                                                   three_star + four_star + 
+                                                   five_star)) %>%
+  mutate(luxury_ratio = (four_star + five_star)/(one_star + two_star + 
+                                                   three_star))
+
+# The star variables are the number of available hotel rooms of that category 
+# per hundred thousand people in each state. Luxury_ratio is the percent of
+# five and four star rooms.
+
+full_9 <- left_join(full_8, food, by = c("state", "Year")) %>%
+  mutate(restaurants = (restaurants/population)*100000)
+full_10 <- left_join(full_9, food_2, by = c("state", "Year")) %>%
+  mutate(nightlife = (nightlife/population)*100000) %>%
+  mutate(nightlife_percent = nightlife/(nightlife + restaurants)) %>%
+  mutate(nightlife_ratio = nightlife/restaurants)
   
 
+# Restaurants is number of hotel restaurants and cafes per 100,000 people. 
+# Nightlife is the number of clubs, bars, dance halls, and discos per 
+# 100,000 people.
 
-ggplot(full, aes(x = victimization, y = GDP_capita)) +
+full_11 <- left_join(full_10, agency, by = c("state", "Year")) %>%
+  mutate(agencies = (agencies/population)*100000) 
+
+# Agencies is the number of travel/tour agencies in each state per 100,000 
+
+full <- left_join(full_11, teaching, by = c("state", "Year")) %>%
+  mutate(schools = (schools/population)*100000) 
+
+ggplot(full, aes(x = nightlife_percent, y = GDP_capita)) +
   geom_point() +
   geom_smooth()
+
+
 ```
 
