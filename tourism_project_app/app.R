@@ -33,12 +33,18 @@ options(scipen=99999999)
 ui <- navbarPage(
     "INTERNATIONAL TOURISM IN MEXICO",
     
-# First tab is about the seize of tourism. It will have three tabs. I 
+# First tab is about the size of tourism. I set up three subtabs. I also set
+# the theme to sandstone.
+
     tabPanel("Size of Tourism",
              fluidPage(
                  theme = shinytheme("sandstone"),
                  titlePanel("How Big is the Tourism Sector?"),
                  tabsetPanel(
+                     
+# Creates a plot of revenue using the check box input. It can have multiple 
+# check box selected at once.
+
                      tabPanel("Revenue",
                               checkboxGroupInput("rev", 
                                             label = "Select Reason", 
@@ -46,6 +52,8 @@ ui <- navbarPage(
                                             selected = "All"),
                               plotOutput("revPlot")),
                    
+# Creates anothe plot of visists using the same steps as above. 
+                     
                      tabPanel("Visits", 
                               checkboxGroupInput("vis", 
                                         label = "Select Type", 
@@ -53,6 +61,9 @@ ui <- navbarPage(
                                         selected = "International Visitors"),
                               plotOutput("visPlot"),
                               p(),
+                              
+# Definitions of the types of tourists and visitors
+                              
                               HTML("<h5><b>International Visitors:</b> All 
                               people who visit
                               Mexico for less than twelve months.
@@ -78,6 +89,10 @@ ui <- navbarPage(
                               HTML("<h5><b>Cruise Ship Trips:</b> Visitors that 
                               temporarily stay in Mexico because of a 
                               cruise.</h5>")),
+
+# Creates a plot of GDP by destination/state. You can use select input to change
+# the measurement from GDP_millions to GDP_capita
+
                      tabPanel("Destinations",
                               selectInput("measure", 
                                                  label = "Select Measure", 
@@ -85,16 +100,23 @@ ui <- navbarPage(
                                                              "GDP_capita"), 
                                                  selected = "GDP_millions"),
                      plotOutput("destPlot"),
-                     imageOutput("map", width = "100%", height = "100%"))
-                      
-                 )
-             )), 
+                     
+# Outputs an image that is a map of Mexico 
+                     
+                     imageOutput("map", width = "100%", height = "100%")
+                    )))), 
              
-                
+# The second tab of the website is about the factors that influence tourism
+# revenue. I also included to subtabs
+
     tabPanel("Factors of Tourism",
              fluidPage(
                  titlePanel("What Factors Influence Tourism Revenue?"),
                  tabsetPanel(
+
+# The first sub tab creates a plot based on the factor you choose from the 
+# select input.
+    
                      tabPanel("Plot",
                  selectInput("factor", label = "Select Factor", 
                              choices = c("one_star",
@@ -106,6 +128,9 @@ ui <- navbarPage(
                                          "nightlife_ratio", "agencies", 
                                          "schools", "victimization", "score")),
                  mainPanel(plotOutput("factPlot"))),
+                 
+# A list of definitions for the factors in the plot subtab. 
+                 
                  tabPanel("Factor Definitions",
                           h3("Factors"),
                           HTML("<h5><b>one_star:</b> Number of one star hotels 
@@ -142,13 +167,16 @@ ui <- navbarPage(
                             that perceived their state to be unsafe or 
                             violent"),
                           HTML("<h5><b>schools:</b> Number of tourism vocational
-                            schools per 100,000 residents")) 
-                      
-             )
-             )
-    ), 
+                            schools per 100,000 residents")
+                          )))), 
+
+# The third table is for a discussion of my linear model and its results
+
     tabPanel("Model",
              titlePanel("Model Discussion"),
+             
+# A discussion of my initial thoughts and ideas.
+             
                       h3("Preliminary Thoughts"),
                       p("From my initial data exploration, it became clear that
                         most tourism GDP is generated from international 
@@ -172,13 +200,22 @@ ui <- navbarPage(
                         schools, and score to include in my model. This formula
                         had a relatively low error (RMSE) in comparison to other
                         formulas."),
+
+# Used withMathJax() to make my mathematical model show up
+
                       h3("Mathematical Model"),
                       withMathJax(),
                       helpText('$$ GDP_i = \\beta_0 + \\beta_1 luxury_i + 
                       \\beta_2 nightlife_i + \\beta_3 agencies_i
                         + \\beta_4 schools_i + \\epsilon_i$$'),
+
+# Outputs a table fo my regression
+
                       h3("Table"),
                       gt_output("table"),
+
+# A discussion of that table
+
                       h3("Analysis"),
                       p("As we can see from the table of this predictive model,
                         most of the variables in the model can not be determined 
@@ -203,6 +240,9 @@ ui <- navbarPage(
                         be significant predictors of GDP_capita; however, 
                         including these variables in the model does lower the
                         overall error (RMSE)"),
+
+# A discusion of further possible research and potential problems
+
                       h3("Further Discussion"),
                       p("From this data analysis, there are more questions that 
                       arise for future reseaarchers. First, there is the fact 
@@ -233,9 +273,15 @@ ui <- navbarPage(
                       important for Mexico to consider what tourism investment
                       strategies will benefit the country the most.
                         ")
-                      ), 
+                      ),
+
+# The fourth and final tab is an about page
+
     tabPanel("About", 
         titlePanel("About"),
+        
+# backgroun info about why I wanted to do this project        
+        
         h3("Project Background and Motivations"),
         p("Growing up, I used to travel to Mexico with my parents to visit 
                family members. While most of my time there was spent at my 
@@ -248,10 +294,18 @@ ui <- navbarPage(
                who travels to Mexico, where they go to spend their money, why 
                people travel, and what tourist attractions generate the most 
                revenue"),
+
+# Personal and contact information
+
         h3("About Me"),
         HTML("<h5>My name is Daniel Salgado-Alvarez and I am freshman at 
              Harvard College. I study Government on the Data Science track. 
              You can reach me at <b>dsalgadoalvarez@college.harvard.edu</b>"),
+
+# Links for all the data sources I used. Keep in mind that all the source data
+# and website were originally in Spanish. I had to translate all of this for
+# the purposes of this project.
+
         h3("Data Sources"),
         h5("GDP Data"),
         tags$a(href="https://www.inegi.org.mx/app/tabulados/default.aspx?pr
@@ -270,13 +324,20 @@ ui <- navbarPage(
                     and Tourism School Data"),
         tags$a(href="https://datatur.sectur.gob.mx/SitePages/CompendioEstad
                     istico.aspx", "Click Here!"),
+
+# Link to the GitHub Repo for this project
+
         h5("GitHub Repo"),
         tags$a(href="https://github.com/danielsalgadoalvarez/tourism_project",
                     "Click Here!")))
              
+# The server
 
 server <- function(input, output) {
-    
+
+# The code needed to output the revenue plot based on the input. I made sure to
+# standardize the theme and color scheme for all plots
+       
     output$revPlot <- renderPlot({
         revenue %>%
             filter(reason %in% input$rev) %>%
@@ -298,7 +359,9 @@ server <- function(input, output) {
                  caption = "Source: Instituto Nacional de 
                  Estadística y Geografía") 
         })  
-   
+
+# This code renders the plot of visitors based on the selected tourist types    
+       
         output$visPlot <- renderPlot({
             visits %>%
                 filter(tourist_type %in% input$vis) %>%
@@ -320,7 +383,9 @@ server <- function(input, output) {
                      caption = "Source: Instituto Nacional de Estadística y
                      Geografía")      
     })
-        
+       
+# This coder renders the plots of GDP revenue by a selected factor        
+         
         output$factPlot <- renderPlot({
             ggplot(full, aes_string(x = input$factor, y = "GDP_capita")) +
                 geom_point(na.rm = TRUE) +
@@ -337,11 +402,15 @@ server <- function(input, output) {
                      caption = "Source: Compendio Estadístico del Turismo en
                      México 2019")      
         })
-        
+
+# This code renders the table in the model tab        
+                
         output$table <- render_gt({
            table2 
         })
-        
+
+# This code render the destinations plot based on the GDP measure selected        
+                
         output$destPlot <- renderPlot({
             destinations %>%
             ggplot(aes_string(x = input$measure, y = "state")) +
@@ -356,6 +425,9 @@ server <- function(input, output) {
                      caption = "Source: Instituto Nacional de Estadística y
                      Geografía")
         })
+        
+# This code renders the image of the map of Mexico        
+        
     output$map <- renderImage({
         list(src = 'map.jpg',
             height = 330,
