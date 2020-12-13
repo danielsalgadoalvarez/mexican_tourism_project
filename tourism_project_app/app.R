@@ -30,35 +30,44 @@ ui <- navbarPage(
                  titlePanel("How Big is the Tourism Sector?"),
                  tabsetPanel(
                      tabPanel("Revenue",
-                              checkboxGroupInput("rev", label = "Select Reason", 
-                                                 choices = unique(revenue$reason), 
-                                                 selected = "All"),
+                              checkboxGroupInput("rev", 
+                                            label = "Select Reason", 
+                                            choices = unique(revenue$reason), 
+                                            selected = "All"),
                               plotOutput("revPlot")),
                    
                      tabPanel("Visits", 
                               checkboxGroupInput("vis", 
-                                                 label = "Select Type", 
-                                                 choices = unique(visits$tourist_type), 
-                                                 selected = "International Visitors"),
+                                        label = "Select Type", 
+                                        choices = unique(visits$tourist_type), 
+                                        selected = "International Visitors"),
                               plotOutput("visPlot"),
                               p(),
-                              HTML("<h5><b>International Visitors:</b> All people who visit
+                              HTML("<h5><b>International Visitors:</b> All 
+                              people who visit
                               Mexico for less than twelve months.
                               The main purpose of the trip 
                               should not be to be paid within Mexico.</h5>"),
-                              HTML("<h5><b>International Tourists:</b> Includes all tourists
+                              HTML("<h5><b>International Tourists:</b> Includes 
+                              all tourists
                                 that stay in Mexico for at least a
                                 day.</h5>"),
-                              HTML("<h5><b>Receptive Tourism:</b> International tourists who
+                              HTML("<h5><b>Receptive Tourism:</b> International 
+                              tourists who
                                 stay within the borders of Mexico.</h5>"),
-                              HTML("<h5><b>Border Tourism:</b> International tourists who
+                              HTML("<h5><b>Border Tourism:</b> International 
+                              tourists who
                                 stay at the border of Mexico.</h5>"),
-                              HTML("<h5><b>International Excursions/Day Trips::</b> Tourism 
-                                that involves visiting Mexico for less than a day.</h5>"),
-                              HTML("<h5><b>Border Excursions/Day Trips:</b> Visitors that stay
+                              HTML("<h5><b>International Excursions/Day 
+                              Trips:</b> Tourism 
+                                that involves visiting Mexico for less 
+                                   than a day.</h5>"),
+                              HTML("<h5><b>Border Excursions/Day Trips:</b> 
+                              Visitors that stay
                                 within Mexico for less than a day.</h5>"),
-                              HTML("<h5><b>Cruise Ship Trips:</b> Visitors that temporarily 
-                              stay in Mexico because of a cruise.</h5>")),
+                              HTML("<h5><b>Cruise Ship Trips:</b> Visitors that 
+                              temporarily stay in Mexico because of a 
+                              cruise.</h5>")),
                      tabPanel("Destinations",
                               selectInput("measure", 
                                                  label = "Select Measure", 
@@ -89,44 +98,47 @@ ui <- navbarPage(
                  mainPanel(plotOutput("factPlot"))),
                  tabPanel("Factor Definitions",
                           h3("Factors"),
-                          HTML("<h5><b>one_star:</b> Number of one star hotels per 100,000 
-                            residents</h5>"),
-                          HTML("<h5><b>two_star:</b> Number of two star hotels per 100,000
-                            residents</h5>"),
-                          HTML("<h5><b>three_star:</b> Number of three star hotels per 100,000
-                            residents</h5>"),
-                          HTML("<h5><b>four_star:</b> Number of four star hotels per 100,000
-                            residents</h5>"),
-                          HTML("<h5><b>five_star:</b> Number of five star hotels per 100,000
-                            residents</h5>"),
-                          HTML("<h5><b>luxury_percent:</b> Percent of four and five star 
+                          HTML("<h5><b>one_star:</b> Number of one star hotels 
+                            per 100,000 residents</h5>"),
+                          HTML("<h5><b>two_star:</b> Number of two star hotels 
+                            per 100,000 residents</h5>"),
+                          HTML("<h5><b>three_star:</b> Number of three star 
+                            hotels per 100,000 residents</h5>"),
+                          HTML("<h5><b>four_star:</b> Number of four star hotels
+                            per 100,000 residents</h5>"),
+                          HTML("<h5><b>five_star:</b> Number of five star hotels
+                            per 100,000 residents</h5>"),
+                          HTML("<h5><b>luxury_percent:</b> Percent of four and 
+                            five star hotels</h5>"),
+                          HTML("<h5><b>luxury_ratio:</b> Ratio of four and five 
+                            star hotels to one, two, and three star 
                             hotels</h5>"),
-                          HTML("<h5><b>luxury_ratio:</b> Ratio of four and five star hotels to
-                            one, two, and three star hotels</h5>"),
-                          HTML("<h5><b>nightlife:</b> Number of nightlife venues (
-                          nightclubs, bars, discos, and dancehalls per 100,000 
-                            residents)</h5>"),
-                          HTML("<h5><b>restaurants:</b> Number of restuarants and 
-                            cafes per 100,000 residents</h5>"),
-                          HTML("<h5><b>nightlife_percent:</b> Percent of nightlife venues 
-                          (nightclubs, bars, discos, and dancehalls)</h5>"),
-                          HTML("<h5><b>nightlife_ratio:</b> Ratio of nighlife venues to 
-                            restaurants and cafes</h5>"),
-                          HTML("<h5><b>agencies:</b> Number of travel agencies and tour guides</h5>"),
-                          HTML("<h5><b>victimization:</b> Number of victims of crime (violent
-                            and property crimes) per 100,000 residents"),
-                          HTML("<h5><b>score:</b> Percent of survey respondents that perceived
-                            their state to be unsafe or violent"),
-                          HTML("<h5><b>schools:</b> Number of tourism vocational schools per
-                            100,000 residents")) 
+                          HTML("<h5><b>nightlife:</b> Number of nightlife venues
+                            (nightclubs, bars, discos, and dancehalls per 
+                            100,000 residents)</h5>"),
+                          HTML("<h5><b>restaurants:</b> Number of restuarants 
+                            and cafes per 100,000 residents</h5>"),
+                          HTML("<h5><b>nightlife_percent:</b> Percent of 
+                            nightlife venues (nightclubs, bars, discos, and 
+                            dancehalls)</h5>"),
+                          HTML("<h5><b>nightlife_ratio:</b> Ratio of nighlife 
+                            venues to restaurants and cafes</h5>"),
+                          HTML("<h5><b>agencies:</b> Number of travel agencies 
+                            and tour guides</h5>"),
+                          HTML("<h5><b>victimization:</b> Number of victims of 
+                            crime (violent and property crimes) per 100,000 
+                            residents"),
+                          HTML("<h5><b>score:</b> Percent of survey respondents 
+                            that perceived their state to be unsafe or 
+                            violent"),
+                          HTML("<h5><b>schools:</b> Number of tourism vocational
+                            schools per 100,000 residents")) 
                       
              )
              )
     ), 
     tabPanel("Model",
              titlePanel("Model Discussion"),
-             tabsetPanel(
-             tabPanel("Interpretation",
                       h3("Preliminary Thoughts"),
                       p("From my initial data exploration, it became clear that
                         most tourism GDP is generated from international 
@@ -211,13 +223,11 @@ ui <- navbarPage(
                       important for Mexico to consider what tourism investment
                       strategies will benefit the country the most.
                         ")
-                      ),
-             tabPanel("Interactive Model",
-                      h1("COMING SOON")))),
+                      ), 
     tabPanel("About", 
-             titlePanel("About"),
-             h3("Project Background and Motivations"),
-             p("Growing up, I used to travel to Mexico with my parents to visit 
+        titlePanel("About"),
+        h3("Project Background and Motivations"),
+        p("Growing up, I used to travel to Mexico with my parents to visit 
                family members. While most of my time there was spent at my 
                grandparent's ranch, I did occasionaly travel to other cities
                and towns to see museums or go shopping. Prior to the COVID-19
@@ -228,27 +238,31 @@ ui <- navbarPage(
                who travels to Mexico, where they go to spend their money, why 
                people travel, and what tourist attractions generate the most 
                revenue"),
-             h3("About Me"),
-             HTML("<h5>My name is Daniel Salgado-Alvarez and I am freshman at Harvard 
-             College. I study Government on the Data Science track. 
+        h3("About Me"),
+        HTML("<h5>My name is Daniel Salgado-Alvarez and I am freshman at 
+             Harvard College. I study Government on the Data Science track. 
              You can reach me at <b>dsalgadoalvarez@college.harvard.edu</b>"),
-             h3("Data Sources"),
-             h5("GDP Data"),
-             tags$a(href="https://www.inegi.org.mx/app/tabulados/default.aspx?pr
+        h3("Data Sources"),
+        h5("GDP Data"),
+        tags$a(href="https://www.inegi.org.mx/app/tabulados/default.aspx?pr
                     =17&vr=7&in=38&tp=20&wr=1&cno=2", "Click Here!"),
-             h5("Population Data"),
-             tags$a(href="https://www.inegi.org.mx/app/tabulados/interactivos/?pxq=
-             Poblacion_Poblacion_01_903d6ce7-5e37-4828-8060-61d3116aaec5", "Click Here!"),
-             h5("Victimization Data"),
-             tags$a(href="https://www.inegi.org.mx/temas/victimizacion/", "Click Here!"),
-             h5("Crime Perceeption Data"),
-             tags$a(href="https://www.inegi.org.mx/temas/percepcion/", "Click Here!"),
-             h5("Hotel, Restaurant, Nightlife, Travel Agency, 
+        h5("Population Data"),
+        tags$a(href="https://www.inegi.org.mx/app/tabulados/interactivos/?pxq=
+             Poblacion_Poblacion_01_903d6ce7-5e37-4828-8060-61d3116aaec5",
+                    "Click Here!"),
+        h5("Victimization Data"),
+        tags$a(href="https://www.inegi.org.mx/temas/victimizacion/",
+                    "Click Here!"),
+        h5("Crime Perceeption Data"),
+        tags$a(href="https://www.inegi.org.mx/temas/percepcion/",
+                    "Click Here!"),
+        h5("Hotel, Restaurant, Nightlife, Travel Agency, 
                     and Tourism School Data"),
-             tags$a(href="https://datatur.sectur.gob.mx/SitePages/CompendioEstad
+        tags$a(href="https://datatur.sectur.gob.mx/SitePages/CompendioEstad
                     istico.aspx", "Click Here!"),
-             h5("GitHub Repo"),
-             tags$a(href="https://github.com/danielsalgadoalvarez/tourism_project", "Click Here!")))
+        h5("GitHub Repo"),
+        tags$a(href="https://github.com/danielsalgadoalvarez/tourism_project",
+                    "Click Here!")))
              
 
 server <- function(input, output) {
@@ -261,7 +275,9 @@ server <- function(input, output) {
             theme_wsj() +
             theme(axis.title=element_text(size= 18)) +
             theme(plot.caption =element_text(size= 10)) +
-            scale_color_manual(name = "Reason for Trip", values = c("#B10318", "#FF7F0F", "Red", 
+            scale_color_manual(name = "Reason for Trip", values = c("#B10318", 
+                                                                    "#FF7F0F", 
+                                                                    "Red", 
                                           "#663300", "#FFB022", "#8B7C6E")) +
             scale_y_continuous(n.breaks = 8, labels = scales::comma) +
             scale_x_continuous(n.breaks = 10) +
@@ -269,7 +285,8 @@ server <- function(input, output) {
                  subtitle = "1990 - 2018",
                  x = "Year",
                  y = "Revenue in Millions of Pesos",
-                 caption = "Source: Instituto Nacional de Estadística y Geografía") 
+                 caption = "Source: Instituto Nacional de 
+                 Estadística y Geografía") 
         })  
    
         output$visPlot <- renderPlot({
@@ -280,14 +297,18 @@ server <- function(input, output) {
                 theme_wsj() +
                 theme(axis.title=element_text(size= 18)) +
                 theme(plot.caption =element_text(size= 10)) +
-                scale_color_manual(name = "Type of Tourist", values = c("#B10318", "#FF7F0E", "Red", 
-                                                                        "#663300", "#FFB022", "#8B7C6E", "#CC6600")) +
+                scale_color_manual(name = "Type of Tourist", 
+                                   values = c("#B10318", "#FF7F0E", "Red", 
+                                              "#663300", "#FFB022", "#8B7C6E",
+                                              "#CC6600")) +
                 scale_y_continuous(n.breaks = 8, labels = scales::comma) +
-                labs(title = "Total Number of International Tourists by Distinction",
+                labs(title = "Total Number of International Tourists
+                     by Distinction",
                      subtitle = "1990 - 2018",
                      x = "Year",
                      y = "Number of Tourists",
-                     caption = "Source: Instituto Nacional de Estadística y Geografía")      
+                     caption = "Source: Instituto Nacional de Estadística y
+                     Geografía")      
     })
         
         output$factPlot <- renderPlot({
@@ -303,7 +324,8 @@ server <- function(input, output) {
                      subtitle = "2003 - 2018",
                      x = input$factor,
                      y = "Tourism GDP Per Capita",
-                     caption = "Source: Compendio Estadístico del Turismo en México 2019")      
+                     caption = "Source: Compendio Estadístico del Turismo en
+                     México 2019")      
         })
         
         output$table <- render_gt({
@@ -321,14 +343,15 @@ server <- function(input, output) {
                 labs(title = "Tourism Revenue by State",
                      subtitle = "2018",
                      y = "State",
-                     caption = "Source: Instituto Nacional de Estadística y Geografía")
+                     caption = "Source: Instituto Nacional de Estadística y
+                     Geografía")
         })
-        output$map <- renderImage({
-            list(src = 'map.jpg',
-                 height = 330,
-                 width = 500,
-                 style = "display: block; margin-left: auto; margin-right: auto;")},
-            deleteFile = FALSE)
+    output$map <- renderImage({
+        list(src = 'map.jpg',
+            height = 330,
+            width = 500,
+            style = "display: block; margin-left: auto; margin-right: auto;")},
+        deleteFile = FALSE)
             
 }
         
