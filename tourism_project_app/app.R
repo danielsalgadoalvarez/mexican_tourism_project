@@ -7,6 +7,9 @@
 #    http://shiny.rstudio.com/
 #
 
+
+# Loading needed library packages
+
 library(shiny)
 library(tidyverse)
 library(readxl)
@@ -14,6 +17,9 @@ library(gt)
 library(ggthemes)
 library(shinythemes)
 library(wesanderson)
+
+# Loading needed RDS files and setting the seed
+
 revenue <- readRDS("revenue.RDS")
 visits <- readRDS("visits2.RDS")
 full <- readRDS("end.RDS")
@@ -22,8 +28,12 @@ destinations <- readRDS("destinations.RDS")
 set.seed(999)
 options(scipen=99999999)
 
+# User interface
+
 ui <- navbarPage(
     "INTERNATIONAL TOURISM IN MEXICO",
+    
+# First tab is about the seize of tourism. It will have three tabs. I 
     tabPanel("Size of Tourism",
              fluidPage(
                  theme = shinytheme("sandstone"),
