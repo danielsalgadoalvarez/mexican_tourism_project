@@ -5,8 +5,8 @@ account: danielsalgadoalvarez
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3173239
-bundleId: 3852744
+bundleId: 3952460
 url: https://danielsalgadoalvarez.shinyapps.io/tourism_project/
-when: 1605197503.77859
+when: 1607300479.20674
 asMultiple: FALSE
 asStatic: FALSE

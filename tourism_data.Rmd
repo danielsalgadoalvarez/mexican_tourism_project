@@ -10,13 +10,26 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse) 
 library(readxl) 
 library(janitor)
+library(rstanarm)
+library(gt)
+library(tidymodels)
+library(ggthemes)
+library(sf)
+library(tmap)
+library(spData)
 ```
 
 ```{r revenue}
+
+# Used read_xlsx to get revenue data from a spread sheet. I had to rename and
+# remove some columns 
+
 revenue <- read_xlsx("datos/3_3.xlsx", sheet = 2, skip = 2) %>%
   slice(2:7) %>%
   select(-c(...1, ...3, ...43, ...44, ...45))
 colnames(revenue)[1] <- "reason"
+
+# I then had to translate some of the factors from Spanish to English
 
 revenue <- revenue %>%
   mutate(reason = recode(reason, 
@@ -28,36 +41,56 @@ revenue <- revenue %>%
                          `Otros` = "Other")) %>%
   pivot_longer(cols = -reason, names_to = "year", values_to = "revenue") %>%
   mutate(year = as.numeric(year))
+
+# Finally, I used pivot_longer() so that I could make graphics with this data
 ```
 
 ```{r visits}
+
+# I did the same exact steps as above but for the visits data spreadsheet 
+
 visits <- read_xlsx("datos/3_1.xlsx", sheet = 1, skip = 1) %>%
   slice(7:13) %>%
   select(!c(...2, Unidades)) 
   colnames(visits)[1] <- "tourist_type"
 
 visits <- visits %>%
-  mutate(tourist_type = recode(tourist_type, 
-                         `Visitantes Internacionales a México` = "International Visitors", 
-                         `Turistas Internacionales` = "International Tourists", 
-                         `Turismo Receptivo` = "Receptive Tourism", 
-                         `Excursionistas Internacionales` = "International Excusions/Day Trips", 
-                         `Excursionistas Fronterizos` = "Border Excursions/ Day Trip",
-                         `Pasajeros en Crucero` = "Cruise Ship Travelers")) %>%
-  pivot_longer(cols = -tourist_type, names_to = "year", values_to = "quantity") %>%
+  mutate(tourist_type = 
+    recode(tourist_type, 
+        `Visitantes Internacionales a México` = "International Visitors", 
+        `Turistas Internacionales` = "International Tourists", 
+        `Turismo Receptivo` = "Receptive Tourism", 
+        `Turismo Fronterizo` = "Border Tourism", 
+        `Excursionistas Internacionales` = "International Excusions/Day Trips", 
+        `Excursionistas Fronterizos` = "Border Excursions/ Day Trip",
+        `Pasajeros en Crucero` = "Cruise Ship Travelers")) %>%
+  pivot_longer(cols = -tourist_type, names_to = "year", 
+               values_to = "quantity") %>%
   mutate(year = as.numeric(year))
 ```
 
 ```{r gdp}
+
+# Again. used same steps to read in and pivot the GDP data
+
 GDP <- read_xlsx("datos/PIBE_37.xlsx", sheet = 1, skip = 3) %>%
   mutate(`2003` = as.numeric(`2003`)) %>%
   slice(5:36) %>%
-  pivot_longer(cols = -Concepto, names_to = "Year", values_to = "GDP_millions" ) %>%
+  pivot_longer(cols = -Concepto, names_to = "Year", 
+               values_to = "GDP_millions" ) %>%
   mutate(Year = str_remove_all(Year, pattern = "R"))
 colnames(GDP)[1] <- "state"
+
+# I had to remove the letter R from some of the years because for some reason a
+# random R would be there.
+
 ```
 
 ```{r crime}
+
+# Similar steps were taken foor crime, perception of crime, and population 
+# data 
+
 crime <- read_xlsx("datos/victimization.xlxs.xlsx", sheet = 1, skip = 1) %>%
   slice(2:33) %>%
   pivot_longer(cols = -State, names_to = "Year", values_to = "victimization" )
@@ -72,6 +105,12 @@ population <- read_xlsx("datos/population.xlsx") %>%
 ```
 
 ```{r hotels}
+
+# For hotel data, I had to crete a new column with the state information since
+# the name of the state would only appear for one star hotels and not the other
+# types of hotels. This was solved by using rep() since data was already grouped
+# by state in the original spreadsheet
+
 hotels <- read_xlsx("datos/6_1.xlsx", sheet = 8) %>%
   slice(7:166) 
   states <- unique(hotels$Estado)[which(!is.na(unique(hotels$Estado)))]
@@ -83,6 +122,8 @@ hotels <- hotels %>%
   pivot_longer(cols = -c(state, Categoria), 
                names_to = "Year", values_to = "rooms") %>%
   group_by(state, Year) 
+
+# I then proceeded to make seperate tibbles for each star rating of hotels
 
 one_star <- hotels %>%
   filter(Categoria == "1 Estrella") %>%
@@ -111,6 +152,9 @@ five_star <- hotels %>%
 ```
 
 ```{r teaching}
+
+# I used the same process to read in the tourism schools data
+
 teaching <- read_xlsx("datos/11_1_redo.xlsx") %>%
   pivot_longer(cols = -state, names_to = "Year", values_to = "schools" )
 
@@ -118,9 +162,14 @@ teaching <- read_xlsx("datos/11_1_redo.xlsx") %>%
 ```
 
 ```{r}
+
+# Again, I used the same steps to read in the restaurants and nightlife data.
+# I used filter() to remove any extreme outliers in the data.
+
 food <- read_xlsx("datos/10_2_res.xlsx", sheet = 4) %>%
   slice(8:40) %>%
-  pivot_longer(cols = -Estado, names_to = "Year", values_to = "restaurants" ) %>%
+  pivot_longer(cols = -Estado, names_to = "Year", 
+               values_to = "restaurants" ) %>%
   mutate(restaurants = as.double(restaurants))  %>%
   filter(restaurants <= 600)
 
@@ -138,6 +187,9 @@ colnames(food_2)[1] <- "state"
 ```
 
 ```{r agencies}
+
+# Finally, I read in the tourism agency data using the same procedure as above.
+
 agency <- read_xlsx("datos/10_3_agencies.xlsx", sheet = 4) %>%
   slice(8:40) %>%
   pivot_longer(cols = -Estado, names_to = "Year", values_to = "agencies" ) %>%
@@ -201,10 +253,61 @@ full_11 <- left_join(full_10, agency, by = c("state", "Year")) %>%
 full <- left_join(full_11, teaching, by = c("state", "Year")) %>%
   mutate(schools = (schools/population)*100000) 
 
-ggplot(full, aes(x = nightlife_percent, y = GDP_capita)) +
-  geom_point() +
-  geom_smooth()
+# schools is the number of schools that teach tourism vocations in each state 
+# per 100,000 
 
 
+```
+
+$$ GDP_i = \beta_0 + \beta_1 luxury_i + \beta_2 nightlife_i + \beta_3 agencies_i
++ \beta_4 schools_i + \epsilon_i$$
+
+```{r}
+
+# Split data into the needed sets to test and train
+
+set.seed(999)
+full_split <- initial_split(full, prop = 0.8)
+full_train <- training(full_split)
+full_test <- testing(full_split)
+full_folds <- vfold_cv(full_train, v = 10)
+
+# Created a linear regression workflow with model and recipe
+  
+full_wfl <- workflow() %>%
+  add_model(linear_reg() %>%
+              set_engine("lm") %>%
+              set_mode("regression")) %>%
+  add_recipe(recipe(GDP_capita ~ luxury_ratio + nightlife_ratio + agencies + schools + score + population, data = full_train))
+
+# Used that work flow and collect_metrics() to calculate the error of each 
+# different recipe
+
+ full_wfl %>%
+  fit_resamples(resamples = full_folds) %>%
+  collect_metrics() %>%
+  select(mean) %>%
+  slice(1) %>%
+  mutate(error = mean) %>%
+  select(error)
+ 
+# Made a table using the recipe with the smallest error using as_tibble. 
+table <- stan_glm(data = full,
+                        formula = GDP_capita ~ luxury_ratio + nightlife_ratio
+                  + agencies + schools + score,
+                        family = gaussian(),
+                        refresh = 0) %>%
+    as_tibble() %>%
+   select(1:5) %>%
+    pivot_longer(cols = everything(), names_to = "Coefficient", 
+                 values_to = "Estimate") %>%
+    group_by(Coefficient) %>%
+    summarize(Median = median(Estimate), CI_Lower = quantile(Estimate, .025),
+              CI_Upper = quantile(Estimate, .975)) %>%
+    gt()
+
+# I used pivot_longer() as well ad gt() to make the table more presentable for
+# my website
+ 
 ```
 
